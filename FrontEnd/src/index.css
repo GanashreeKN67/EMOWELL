@@ -9,12 +9,15 @@
   --color-text-light: #95a5a6;
   --color-bg: #ffffff;
   --color-bg-soft: #f8f9fa;
+  --color-border-soft: rgba(15, 23, 42, 0.08);
   --color-footer: #2e2e42;
   --color-footer-alt: #1f2937;
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-button: 0 4px 12px rgba(0, 102, 204, 0.3);
+  --shadow-soft: 0 12px 24px rgba(15, 23, 42, 0.08);
   --radius-lg: 12px;
   --radius-md: 8px;
+  --radius-xl: 24px;
   --radius-pill: 999px;
   --max-width: 1200px;
   font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -37,10 +40,12 @@
   --color-text-light: #9ca3af;
   --color-bg: #0f172a;
   --color-bg-soft: #1e293b;
+  --color-border-soft: rgba(255, 255, 255, 0.08);
   --color-footer: #0a0f1f;
   --color-footer-alt: #060913;
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-button: 0 4px 12px rgba(77, 166, 255, 0.3);
+  --shadow-soft: 0 12px 24px rgba(0, 0, 0, 0.35);
 }
 
 *,

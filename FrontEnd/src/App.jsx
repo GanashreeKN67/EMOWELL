@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import TextSupport from "./pages/TextSupport";
 import AudioSupport from "./pages/AudioSupport";
 import ImageSupport from "./pages/ImageSupport";
+import DatasetOverview from "./pages/DatasetOverview";
 import ChatbotOverlay from "./components/chatbot/ChatbotOverlay";
 import "./App.css";
 
@@ -47,6 +48,7 @@ function App() {
           <Route path="/text" element={<TextSupport />} />
           <Route path="/audio" element={<AudioSupport />} />
           <Route path="/image" element={<ImageSupport />} />
+          <Route path="/datasets" element={<DatasetOverview />} />
         </Routes>
       </main>
       <Footer />

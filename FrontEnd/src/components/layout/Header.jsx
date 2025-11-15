@@ -31,6 +31,11 @@ const navLinks = [
     type: "route",
   },
   {
+    label: "Datasets",
+    to: "/datasets",
+    type: "route",
+  },
+  {
     label: "Contact",
     to: { pathname: "/", hash: "#contact" },
     type: "hash",
