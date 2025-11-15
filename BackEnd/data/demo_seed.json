@@ -1,0 +1,61 @@
+{
+  "admins": [
+    {
+      "email": "admin@emowell.com",
+      "password": "AdminAccess#2025",
+      "full_name": "EMOWELL Admin"
+    }
+  ],
+  "users": [
+    {
+      "email": "demo@emowell.com",
+      "password": "DemoUser#2025",
+      "full_name": "Demo Explorer",
+      "status": "approved",
+      "behavior": [
+        {
+          "date": "2025-11-08",
+          "modality": "text",
+          "emotion": "anxious",
+          "confidence": 0.82,
+          "notes": "Self-reflection prompt"
+        },
+        {
+          "date": "2025-11-09",
+          "modality": "audio",
+          "emotion": "calm",
+          "confidence": 0.77,
+          "notes": "Breathing exercise log"
+        },
+        {
+          "date": "2025-11-10",
+          "modality": "image",
+          "emotion": "happy",
+          "confidence": 0.88,
+          "notes": "Facial snapshot"
+        },
+        {
+          "date": "2025-11-11",
+          "modality": "chatbot",
+          "emotion": "neutral",
+          "confidence": 0.64,
+          "notes": "Chat about weekend plans"
+        },
+        {
+          "date": "2025-11-12",
+          "modality": "text",
+          "emotion": "hopeful",
+          "confidence": 0.9,
+          "notes": "Positive journaling"
+        }
+      ]
+    },
+    {
+      "email": "insights@emowell.com",
+      "password": "Insights#2025",
+      "full_name": "Insights Researcher",
+      "status": "pending",
+      "behavior": []
+    }
+  ]
+}

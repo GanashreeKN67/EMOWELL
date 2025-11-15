@@ -3,6 +3,8 @@ import Icon from "../common/Icon";
 import { detectTextEmotion } from "../../services/apiClient";
 import AnalysisResult from "./AnalysisResult";
 import { evaluationQuestions, moodOptions } from "../../data/supportData";
+import AuthWall from "../auth/AuthWall";
+import { useAuth } from "../../context/AuthContext";
 
 const TextSupportPanel = () => {
   const [selectedMood, setSelectedMood] = useState("fear");
@@ -13,6 +15,16 @@ const TextSupportPanel = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return (
+      <AuthWall
+        title="Sign in to use text support"
+        description="Create an account or log in so we can personalise your insights and keep your progress synced."
+      />
+    );
+  }
 
   const selectedMoodLabel =
     moodOptions.find((item) => item.id === selectedMood)?.label ?? "";

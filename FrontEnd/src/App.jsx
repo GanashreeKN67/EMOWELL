@@ -7,7 +7,11 @@ import TextSupport from "./pages/TextSupport";
 import AudioSupport from "./pages/AudioSupport";
 import ImageSupport from "./pages/ImageSupport";
 import DatasetOverview from "./pages/DatasetOverview";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 import ChatbotOverlay from "./components/chatbot/ChatbotOverlay";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import "./App.css";
 
 function App() {
@@ -45,10 +49,25 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/text" element={<TextSupport />} />
-          <Route path="/audio" element={<AudioSupport />} />
-          <Route path="/image" element={<ImageSupport />} />
           <Route path="/datasets" element={<DatasetOverview />} />
+          <Route
+            path="/text"
+            element={<ProtectedRoute element={<TextSupport />} />}
+          />
+          <Route
+            path="/audio"
+            element={<ProtectedRoute element={<AudioSupport />} />}
+          />
+          <Route
+            path="/image"
+            element={<ProtectedRoute element={<ImageSupport />} />}
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/dashboard"
+            element={<ProtectedRoute element={<Dashboard />} />}
+          />
         </Routes>
       </main>
       <Footer />

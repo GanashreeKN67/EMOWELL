@@ -1,11 +1,14 @@
+import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useChatbot } from "../../context/ChatbotContext";
 import { sendChatMessage } from "../../services/apiClient";
 import Icon from "../common/Icon";
 import ReactMarkdown from "react-markdown";
+import { useAuth } from "../../context/AuthContext";
 
 const ChatbotOverlay = () => {
   const { isOpen, closeChatbot } = useChatbot();
+  const { isAuthenticated } = useAuth();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +55,10 @@ const ChatbotOverlay = () => {
     event.preventDefault();
     const trimmed = message.trim();
     if (!trimmed || isLoading) {
+      return;
+    }
+
+    if (!isAuthenticated) {
       return;
     }
 
@@ -139,70 +146,105 @@ const ChatbotOverlay = () => {
           </button>
         </header>
         <div className="chatbot-overlay__body">
-          <div
-            className="chatbot-overlay__messages"
-            role="log"
-            aria-live="polite"
-          >
-            {messages.length === 0 ? (
-              <div className="chatbot-overlay__placeholder">
-                <h3>How can I help today?</h3>
-                <p>
-                  Share a thought, worry, or win and I will respond right away.
-                </p>
-              </div>
-            ) : null}
-            {messages.map((item) => {
-              return (
-                <div
-                  key={item.id}
-                  className={`chatbot-overlay__message chatbot-overlay__message--${item.role}`}
-                >
-                  <div className="markdown-content">
-                    <ReactMarkdown>{item.content}</ReactMarkdown>
+          {isAuthenticated ? (
+            <>
+              <div
+                className="chatbot-overlay__messages"
+                role="log"
+                aria-live="polite"
+              >
+                {messages.length === 0 ? (
+                  <div className="chatbot-overlay__placeholder">
+                    <h3>How can I help today?</h3>
+                    <p>
+                      Share a thought, worry, or win and I will respond right
+                      away.
+                    </p>
                   </div>
-                </div>
-              );
-            })}
-            {isLoading ? (
-              <div className="chatbot-overlay__loading">
-                <span className="analysis-status__spinner" aria-hidden="true" />
-                Thinking through your message...
+                ) : null}
+                {messages.map((item) => {
+                  return (
+                    <div
+                      key={item.id}
+                      className={`chatbot-overlay__message chatbot-overlay__message--${item.role}`}
+                    >
+                      <div className="markdown-content">
+                        <ReactMarkdown>{item.content}</ReactMarkdown>
+                      </div>
+                    </div>
+                  );
+                })}
+                {isLoading ? (
+                  <div className="chatbot-overlay__loading">
+                    <span
+                      className="analysis-status__spinner"
+                      aria-hidden="true"
+                    />
+                    Thinking through your message...
+                  </div>
+                ) : null}
+                <div ref={scrollAnchorRef} />
               </div>
-            ) : null}
-            <div ref={scrollAnchorRef} />
-          </div>
-          {errorMessage ? (
-            <div className="chatbot-overlay__error">{errorMessage}</div>
-          ) : null}
+              {errorMessage ? (
+                <div className="chatbot-overlay__error">{errorMessage}</div>
+              ) : null}
+            </>
+          ) : (
+            <div className="chatbot-overlay__locked">
+              <h3>Sign in to chat</h3>
+              <p>
+                You need to be logged in so we can keep your chatbot journey
+                synced to your dashboard.
+              </p>
+              <div className="chatbot-overlay__locked-actions">
+                <Link
+                  className="btn btn--primary"
+                  to="/login"
+                  onClick={closeChatbot}
+                >
+                  Go to login
+                </Link>
+                <Link
+                  className="btn btn--outline"
+                  to="/register"
+                  onClick={closeChatbot}
+                >
+                  Create account
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
-        <form className="chatbot-overlay__form" onSubmit={handleSubmit}>
-          <textarea
-            id="chatbot-message"
-            ref={inputRef}
-            rows="3"
-            placeholder="Send a message..."
-            aria-label="Message"
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-          />
-          <div className="chatbot-overlay__actions">
-            <button
-              type="submit"
-              className="btn btn--primary"
-              disabled={isLoading}
-            >
-              Send
-            </button>
-            <button
-              type="button"
-              className="btn btn--outline"
-              onClick={closeChatbot}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+        {isAuthenticated ? (
+          <form className="chatbot-overlay__form" onSubmit={handleSubmit}>
+            <textarea
+              id="chatbot-message"
+              ref={inputRef}
+              rows="3"
+              placeholder="Send a message..."
+              aria-label="Message"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              disabled={!isAuthenticated}
+            />
+            <div className="chatbot-overlay__actions">
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={isLoading}
+              >
+                Send
+              </button>
+              <button
+                type="button"
+                className="btn btn--outline"
+                onClick={closeChatbot}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : null}
       </div>
     </div>
   );

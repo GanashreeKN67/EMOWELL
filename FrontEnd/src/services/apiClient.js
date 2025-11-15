@@ -22,22 +22,32 @@ const formatError = async (response) => {
   }
 };
 
+const getAuthToken = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  return window.localStorage.getItem("emowell_token");
+};
+
 const request = async (path, options = {}, customTimeout = MAX_TIMEOUT) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(function onTimeout() {
     controller.abort();
   }, customTimeout);
 
+  const finalHeaders = Object.assign({}, options.headers);
+  const token = getAuthToken();
+  if (token) {
+    finalHeaders.Authorization = `Bearer ${token}`;
+  }
+
+  const finalOptions = Object.assign({}, options, {
+    headers: finalHeaders,
+    signal: controller.signal,
+  });
+
   try {
-    const response = await fetch(
-      `${API_BASE_URL}${path}`,
-      Object.assign(
-        {
-          signal: controller.signal,
-        },
-        options
-      )
-    );
+    const response = await fetch(`${API_BASE_URL}${path}`, finalOptions);
 
     if (!response.ok) {
       const message = await formatError(response);
@@ -99,7 +109,7 @@ export const detectImageEmotion = async ({ file }) => {
   );
 };
 
-export const detectAudioEmotion = async (file) => {
+export const detectAudioEmotion = async ({ file }) => {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -158,3 +168,35 @@ export const detectCombinedEmotion = async (config) => {
 export const getServerHealth = () => request("/health");
 
 export const getModelStatus = () => request("/health/models");
+
+export const registerUser = (payload) =>
+  request("/auth/register", {
+    method: "POST",
+    headers: JSON_HEADERS,
+    body: JSON.stringify(payload),
+  });
+
+export const loginUser = (payload) =>
+  request("/auth/login", {
+    method: "POST",
+    headers: JSON_HEADERS,
+    body: JSON.stringify(payload),
+  });
+
+export const fetchCurrentUser = () =>
+  request("/auth/me", {
+    method: "GET",
+    headers: JSON_HEADERS,
+  });
+
+export const fetchDashboardOverview = (rangeDays = 14) =>
+  request(`/dashboard/overview?range_days=${rangeDays}`);
+
+export const fetchPendingUsers = () => request("/admin/users/pending");
+
+export const decidePendingUser = ({ userId, approve, notes }) =>
+  request(`/admin/users/${userId}/decision`, {
+    method: "POST",
+    headers: JSON_HEADERS,
+    body: JSON.stringify({ approve, notes }),
+  });

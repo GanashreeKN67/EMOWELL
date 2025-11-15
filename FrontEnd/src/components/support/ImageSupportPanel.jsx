@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import Icon from "../common/Icon";
 import AnalysisResult from "./AnalysisResult";
 import { detectImageEmotion } from "../../services/apiClient";
+import AuthWall from "../auth/AuthWall";
+import { useAuth } from "../../context/AuthContext";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
 
 const ImageSupportPanel = () => {
+  const { isAuthenticated } = useAuth();
   const [fileName, setFileName] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -156,6 +159,15 @@ const ImageSupportPanel = () => {
       stopCamera();
     };
   }, [isCameraOverlayOpen]);
+
+  if (!isAuthenticated) {
+    return (
+      <AuthWall
+        title="Sign in to use image support"
+        description="Log in so we can store your photo insights privately and display them on your dashboard."
+      />
+    );
+  }
 
   const handleSubmit = async () => {
     if (!selectedFile) {

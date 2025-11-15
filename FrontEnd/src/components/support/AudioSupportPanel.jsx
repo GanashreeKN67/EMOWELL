@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import Icon from "../common/Icon";
 import AnalysisResult from "./AnalysisResult";
 import { detectAudioEmotion } from "../../services/apiClient";
+import AuthWall from "../auth/AuthWall";
+import { useAuth } from "../../context/AuthContext";
 
 const getAudioContext = () => {
   if (typeof window === "undefined") {
@@ -103,6 +105,7 @@ const convertBlobToWavFile = async (blob) => {
 };
 
 const AudioSupportPanel = () => {
+  const { isAuthenticated } = useAuth();
   const [mode, setMode] = useState("record");
   const [fileName, setFileName] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
@@ -254,6 +257,15 @@ const AudioSupportPanel = () => {
     setResult(null);
   };
 
+  if (!isAuthenticated) {
+    return (
+      <AuthWall
+        title="Sign in to record audio"
+        description="Log in to securely analyse your voice samples and track progress over time."
+      />
+    );
+  }
+
   const handleSubmitRecording = async () => {
     if (!recordedFile) {
       setErrorMessage("Please record audio before submitting.");
@@ -273,7 +285,7 @@ const AudioSupportPanel = () => {
     setErrorMessage("");
 
     try {
-      const payload = await detectAudioEmotion(recordedFile);
+      const payload = await detectAudioEmotion({ file: recordedFile });
       setResult(
         Object.assign({}, payload, {
           modality: "Audio",
@@ -317,7 +329,7 @@ const AudioSupportPanel = () => {
     setErrorMessage("");
 
     try {
-      const payload = await detectAudioEmotion(selectedFile);
+      const payload = await detectAudioEmotion({ file: selectedFile });
       setResult(
         Object.assign({}, payload, {
           modality: "Audio",

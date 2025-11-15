@@ -10,6 +10,8 @@
   --color-bg: #ffffff;
   --color-bg-soft: #f8f9fa;
   --color-border-soft: rgba(15, 23, 42, 0.08);
+  --color-border: rgba(15, 23, 42, 0.15);
+  --color-border-subtle: rgba(15, 23, 42, 0.12);
   --color-surface-tooltip: #ffffff;
   --color-chart-train: #0066cc;
   --color-chart-validation: #f97316;
@@ -47,6 +49,8 @@
   --color-bg: #0f172a;
   --color-bg-soft: #1e293b;
   --color-border-soft: rgba(255, 255, 255, 0.08);
+  --color-border: rgba(255, 255, 255, 0.22);
+  --color-border-subtle: rgba(255, 255, 255, 0.18);
   --color-surface-tooltip: #0b1220;
   --color-chart-train: #4da6ff;
   --color-chart-validation: #fbbf24;

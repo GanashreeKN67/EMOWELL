@@ -16,6 +16,16 @@ AUDIO_SCALER_PATH = os.getenv("AUDIO_SCALER_PATH", "./models_saved/scaler.pkl")
 # Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+# Database (MongoDB)
+MONGODB_URI = os.getenv("MONGODB_URI")
+MONGODB_ATLAS_URI = os.getenv("MONGODB_ATLAS_URI")
+MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "emowell_insights")
+
+# Auth / Security
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "change-this-secret")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
+
 # File Upload Settings
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 ALLOWED_IMAGE_FORMATS = {'.jpg', '.jpeg', '.png'}

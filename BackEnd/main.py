@@ -1,10 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config import DEBUG, HOST, PORT
+from database import close_mongo_connection, connect_to_mongo
 from routes import emotion, assistant, health
+from routes import auth as auth_routes
+from routes import admin as admin_routes
+from routes import dashboard as dashboard_routes
 from models.image_model import load_image_model
 from models.audio_model import load_audio_model
 from datetime import datetime
+from services.seed_service import seed_demo_data
+from services.user_service import ensure_user_indexes
 
 app = FastAPI(
     title="CLARITY - Emotion Recognition & Mental Health Support",
@@ -28,6 +34,10 @@ async def startup_event():
     print("Starting CLARITY Backend...")
     print("=" * 80)
 
+    await connect_to_mongo()
+    await ensure_user_indexes()
+    await seed_demo_data()
+
     print("\nLoading Image Emotion Model...")
     if load_image_model():
         print("   [OK] Image model loaded successfully")
@@ -49,8 +59,12 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown"""
     print("\nShutting down CLARITY Backend...")
+    await close_mongo_connection()
 
 
+app.include_router(auth_routes.router)
+app.include_router(admin_routes.router)
+app.include_router(dashboard_routes.router)
 app.include_router(emotion.router)
 app.include_router(assistant.router)
 app.include_router(health.router)
