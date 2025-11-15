@@ -19,7 +19,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # File Upload Settings
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 ALLOWED_IMAGE_FORMATS = {'.jpg', '.jpeg', '.png'}
-ALLOWED_AUDIO_FORMATS = {'.wav', '.mp3', '.ogg', '.flac', '.m4a'}
+ALLOWED_AUDIO_FORMATS = {'.wav', '.mp3', '.ogg', '.flac', '.m4a', '.webm'}
 
 # Audio Processing
 AUDIO_SAMPLE_RATE = 22050

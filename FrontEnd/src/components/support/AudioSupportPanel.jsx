@@ -3,6 +3,105 @@ import Icon from "../common/Icon";
 import AnalysisResult from "./AnalysisResult";
 import { detectAudioEmotion } from "../../services/apiClient";
 
+const getAudioContext = () => {
+  if (typeof window === "undefined") {
+    throw new Error("Audio capture is only available in the browser.");
+  }
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    throw new Error("This browser does not support audio processing.");
+  }
+  return new AudioContextClass();
+};
+
+const floatTo16BitPCM = (view, offset, input) => {
+  for (let i = 0; i < input.length; i += 1, offset += 2) {
+    const sample = Math.max(-1, Math.min(1, input[i]));
+    view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+  }
+};
+
+const interleaveChannels = (audioBuffer) => {
+  const numberOfChannels = audioBuffer.numberOfChannels;
+  if (numberOfChannels === 1) {
+    return audioBuffer.getChannelData(0);
+  }
+
+  const length = audioBuffer.length * numberOfChannels;
+  const result = new Float32Array(length);
+  const channels = [];
+  for (let i = 0; i < numberOfChannels; i += 1) {
+    channels.push(audioBuffer.getChannelData(i));
+  }
+
+  let writeIndex = 0;
+  for (
+    let sampleIndex = 0;
+    sampleIndex < audioBuffer.length;
+    sampleIndex += 1
+  ) {
+    for (
+      let channelIndex = 0;
+      channelIndex < numberOfChannels;
+      channelIndex += 1
+    ) {
+      result[writeIndex] = channels[channelIndex][sampleIndex];
+      writeIndex += 1;
+    }
+  }
+
+  return result;
+};
+
+const audioBufferToWavArrayBuffer = (audioBuffer) => {
+  const headerLength = 44;
+  const bytesPerSample = 2;
+  const numberOfChannels = audioBuffer.numberOfChannels;
+  const sampleRate = audioBuffer.sampleRate;
+  const interleaved = interleaveChannels(audioBuffer);
+  const dataLength = interleaved.length * bytesPerSample;
+  const buffer = new ArrayBuffer(headerLength + dataLength);
+  const view = new DataView(buffer);
+
+  const writeString = (offset, text) => {
+    for (let i = 0; i < text.length; i += 1) {
+      view.setUint8(offset + i, text.charCodeAt(i));
+    }
+  };
+
+  writeString(0, "RIFF");
+  view.setUint32(4, 36 + dataLength, true);
+  writeString(8, "WAVE");
+  writeString(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numberOfChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numberOfChannels * bytesPerSample, true);
+  view.setUint16(32, numberOfChannels * bytesPerSample, true);
+  view.setUint16(34, 8 * bytesPerSample, true);
+  writeString(36, "data");
+  view.setUint32(40, dataLength, true);
+
+  floatTo16BitPCM(view, headerLength, interleaved);
+
+  return buffer;
+};
+
+const convertBlobToWavFile = async (blob) => {
+  const audioContext = getAudioContext();
+  try {
+    const arrayBuffer = await blob.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    const wavArrayBuffer = audioBufferToWavArrayBuffer(audioBuffer);
+    return new File([wavArrayBuffer], "recording.wav", { type: "audio/wav" });
+  } finally {
+    if (typeof audioContext.close === "function") {
+      await audioContext.close();
+    }
+  }
+};
+
 const AudioSupportPanel = () => {
   const [mode, setMode] = useState("record");
   const [fileName, setFileName] = useState("");
@@ -11,15 +110,16 @@ const AudioSupportPanel = () => {
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
-  const [recordedBlob, setRecordedBlob] = useState(null);
+  const [recordedFile, setRecordedFile] = useState(null);
   const [audioPreviewUrl, setAudioPreviewUrl] = useState("");
   const [isAudioPreviewVisible, setAudioPreviewVisible] = useState(false);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const hasRecording = Boolean(recordedFile);
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-  const ACCEPTED_EXTENSIONS = ["mp3", "wav", "ogg", "flac", "m4a"];
+  const ACCEPTED_EXTENSIONS = ["mp3", "wav", "ogg", "flac", "m4a", "webm"];
 
   useEffect(
     () => () => {
@@ -40,7 +140,7 @@ const AudioSupportPanel = () => {
     setFileName(file ? file.name : "");
     setResult(null);
     setErrorMessage("");
-    setRecordedBlob(null);
+    setRecordedFile(null);
     setAudioPreviewVisible(false);
     setAudioPreviewUrl((currentUrl) => {
       if (currentUrl) {
@@ -53,8 +153,22 @@ const AudioSupportPanel = () => {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
+      try {
+        mediaRecorderRef.current = new MediaRecorder(stream, {
+          mimeType: "audio/webm;codecs=opus",
+        });
+      } catch (recorderError) {
+        mediaRecorderRef.current = new MediaRecorder(stream);
+      }
       audioChunksRef.current = [];
+      setRecordedFile(null);
+      setAudioPreviewVisible(false);
+      setAudioPreviewUrl((currentUrl) => {
+        if (currentUrl) {
+          URL.revokeObjectURL(currentUrl);
+        }
+        return "";
+      });
 
       mediaRecorderRef.current.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -62,19 +176,40 @@ const AudioSupportPanel = () => {
         }
       };
 
-      mediaRecorderRef.current.onstop = () => {
+      mediaRecorderRef.current.onstop = async () => {
+        const mimeType =
+          mediaRecorderRef.current && mediaRecorderRef.current.mimeType
+            ? mediaRecorderRef.current.mimeType
+            : "audio/webm";
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/wav",
+          type: mimeType,
         });
-        setRecordedBlob(audioBlob);
-        setAudioPreviewVisible(false);
-        setAudioPreviewUrl((currentUrl) => {
-          if (currentUrl) {
-            URL.revokeObjectURL(currentUrl);
-          }
-          return URL.createObjectURL(audioBlob);
-        });
-        stream.getTracks().forEach((track) => track.stop());
+        try {
+          const wavFile = await convertBlobToWavFile(audioBlob);
+          setRecordedFile(wavFile);
+          setAudioPreviewVisible(false);
+          setAudioPreviewUrl((currentUrl) => {
+            if (currentUrl) {
+              URL.revokeObjectURL(currentUrl);
+            }
+            return URL.createObjectURL(wavFile);
+          });
+          setErrorMessage("");
+        } catch (conversionError) {
+          console.error("Recording conversion failed", conversionError);
+          setRecordedFile(null);
+          setAudioPreviewUrl((currentUrl) => {
+            if (currentUrl) {
+              URL.revokeObjectURL(currentUrl);
+            }
+            return "";
+          });
+          setErrorMessage(
+            "We couldn't process that recording. Please try again or upload an audio file."
+          );
+        } finally {
+          stream.getTracks().forEach((track) => track.stop());
+        }
       };
 
       mediaRecorderRef.current.start();
@@ -102,14 +237,31 @@ const AudioSupportPanel = () => {
     setAudioPreviewVisible((previous) => !previous);
   };
 
+  const handleReRecord = () => {
+    if (isRecording) {
+      return;
+    }
+    setRecordedFile(null);
+    setAudioPreviewVisible(false);
+    setAudioPreviewUrl((currentUrl) => {
+      if (currentUrl) {
+        URL.revokeObjectURL(currentUrl);
+      }
+      return "";
+    });
+    audioChunksRef.current = [];
+    setErrorMessage("");
+    setResult(null);
+  };
+
   const handleSubmitRecording = async () => {
-    if (!recordedBlob) {
+    if (!recordedFile) {
       setErrorMessage("Please record audio before submitting.");
       setResult(null);
       return;
     }
 
-    if (recordedBlob.size > MAX_FILE_SIZE) {
+    if (recordedFile.size > MAX_FILE_SIZE) {
       setErrorMessage(
         "That recording is larger than 10MB. Please record a shorter clip."
       );
@@ -121,10 +273,7 @@ const AudioSupportPanel = () => {
     setErrorMessage("");
 
     try {
-      const file = new File([recordedBlob], "recording.wav", {
-        type: "audio/wav",
-      });
-      const payload = await detectAudioEmotion(file);
+      const payload = await detectAudioEmotion(recordedFile);
       setResult(
         Object.assign({}, payload, {
           modality: "Audio",
@@ -158,7 +307,7 @@ const AudioSupportPanel = () => {
     const extension = selectedFile.name.split(".").pop().toLowerCase();
     if (!ACCEPTED_EXTENSIONS.includes(extension)) {
       setErrorMessage(
-        "Unsupported file type. Please upload a WAV, MP3, OGG, FLAC, or M4A file."
+        "Unsupported file type. Please upload a WAV, MP3, OGG, FLAC, M4A, or WEBM file."
       );
       setResult(null);
       return;
@@ -226,49 +375,60 @@ const AudioSupportPanel = () => {
             When you are ready, press the button and speak for up to two
             minutes. The clip will be sent straight to the audio analyser.
           </p>
+          {hasRecording && !isRecording ? (
+            <p className="audio-support__file">
+              Recording ready ({(recordedFile.size / 1024).toFixed(2)} KB)
+            </p>
+          ) : null}
           <div className="audio-support__controls">
-            <button
-              type="button"
-              className="btn btn--primary"
-              onClick={startRecording}
-              disabled={isRecording || isLoading}
-            >
-              {isRecording ? "Recording..." : "Start recording"}
-            </button>
-            <button
-              type="button"
-              className="btn btn--outline"
-              onClick={stopRecording}
-              disabled={!isRecording}
-            >
-              Stop
-            </button>
-            {recordedBlob && !isRecording ? (
-              <button
-                type="button"
-                className="btn btn--primary"
-                onClick={handleSubmitRecording}
-                disabled={isLoading}
-              >
-                Analyse recording
-              </button>
+            {!hasRecording ? (
+              <>
+                <button
+                  type="button"
+                  className="btn btn--primary"
+                  onClick={startRecording}
+                  disabled={isRecording || isLoading}
+                >
+                  {isRecording ? "Recording..." : "Start recording"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--outline"
+                  onClick={stopRecording}
+                  disabled={!isRecording}
+                >
+                  Stop
+                </button>
+              </>
+            ) : null}
+            {hasRecording && !isRecording ? (
+              <>
+                <button
+                  type="button"
+                  className="btn btn--outline"
+                  onClick={toggleAudioPreview}
+                  disabled={!audioPreviewUrl}
+                >
+                  {isAudioPreviewVisible ? "Hide preview" : "Preview audio"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--primary"
+                  onClick={handleSubmitRecording}
+                  disabled={isLoading}
+                >
+                  Analyse recording
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={handleReRecord}
+                >
+                  Re-record audio
+                </button>
+              </>
             ) : null}
           </div>
-          {recordedBlob && !isRecording ? (
-            <div className="audio-support__preview-controls">
-              <p className="audio-support__file">
-                Recording ready ({(recordedBlob.size / 1024).toFixed(2)} KB)
-              </p>
-              <button
-                type="button"
-                className="btn btn--outline"
-                onClick={toggleAudioPreview}
-                disabled={!audioPreviewUrl}
-              >
-                {isAudioPreviewVisible ? "Hide preview" : "Preview audio"}
-              </button>
-            </div>
-          ) : null}
         </div>
       ) : (
         <div className="audio-support__card">
