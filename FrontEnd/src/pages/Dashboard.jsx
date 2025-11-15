@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   decidePendingUser,
   fetchDashboardOverview,
@@ -45,31 +45,55 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [overview, setOverview] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [pendingUsers, setPendingUsers] = useState([]);
   const [actionMessage, setActionMessage] = useState("");
   const [rangeDays, setRangeDays] = useState(7);
   const isAdmin = user?.role === "admin";
+  const initialLoadRef = useRef(true);
 
   useEffect(() => {
+    let isActive = true;
+
     const load = async () => {
-      setIsLoading(true);
+      if (initialLoadRef.current) {
+        setIsLoading(true);
+      } else {
+        setIsTransitioning(true);
+      }
       setErrorMessage("");
       try {
         const payload = await fetchDashboardOverview(rangeDays);
-        setOverview(payload);
-        if (isAdmin) {
-          const pendingPayload = await fetchPendingUsers();
-          setPendingUsers(pendingPayload.pending || []);
+        if (isActive) {
+          setOverview(payload);
+          if (isAdmin) {
+            const pendingPayload = await fetchPendingUsers();
+            if (isActive) {
+              setPendingUsers(pendingPayload.pending || []);
+            }
+          }
         }
       } catch (error) {
-        setErrorMessage(error.message || "Unable to load dashboard data.");
+        if (isActive) {
+          setErrorMessage(error.message || "Unable to load dashboard data.");
+        }
       } finally {
-        setIsLoading(false);
+        if (isActive) {
+          if (initialLoadRef.current) {
+            setIsLoading(false);
+            initialLoadRef.current = false;
+          }
+          setIsTransitioning(false);
+        }
       }
     };
 
     load();
+
+    return () => {
+      isActive = false;
+    };
   }, [isAdmin, rangeDays]);
 
   const rangeFilters = useMemo(() => {
@@ -92,6 +116,9 @@ const Dashboard = () => {
 
   const handleRangeChange = (value) => {
     if (value !== rangeDays) {
+      if (!initialLoadRef.current) {
+        setIsTransitioning(true);
+      }
       setRangeDays(value);
     }
   };
@@ -284,6 +311,10 @@ const Dashboard = () => {
     return active?.label ?? "Selected range";
   }, [rangeDays, rangeFilters]);
 
+  const overlayMessageLabel = useMemo(() => {
+    return (activeRangeLabel || "Selected range").toLowerCase();
+  }, [activeRangeLabel]);
+
   const handleDecision = async (targetUserId, approve) => {
     try {
       setActionMessage("");
@@ -301,8 +332,13 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="dashboard dashboard--loading" role="status">
-        Loading your insights...
+      <div
+        className="dashboard-loading-screen"
+        role="status"
+        aria-live="polite"
+      >
+        <div className="loading-spinner" aria-hidden="true" />
+        <p>Loading your insights...</p>
       </div>
     );
   }
@@ -321,7 +357,17 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="dashboard">
+    <div className={`dashboard${isTransitioning ? " is-transitioning" : ""}`}>
+      {isTransitioning ? (
+        <div
+          className="dashboard__loading-overlay"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="loading-spinner" aria-hidden="true" />
+          <p>Refreshing {overlayMessageLabel}...</p>
+        </div>
+      ) : null}
       <section className="dashboard__hero">
         <div className="dashboard__hero-content">
           <p className="dashboard__eyebrow">Personal insights</p>
