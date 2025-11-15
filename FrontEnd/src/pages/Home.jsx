@@ -25,7 +25,7 @@ const Home = () => {
       <section className="hero" id="home">
         <div className="hero__overlay" />
         <div className="hero__content container">
-          <h1>Remedic Medical Center</h1>
+          <h1>EMOWELL Medical Center</h1>
           <p>
             Accessible medical support blended with empathic digital guidance.
             Choose text, audio, or image channels and get care the way you
@@ -49,45 +49,53 @@ const Home = () => {
       <section className="about-section" id="about">
         <div className="container about-section__grid">
           <div className="about-section__content">
-            <p className="about-section__eyebrow">Trusted For Over 20 Years</p>
-            <h2>
-              Whole-person healthcare paired with modern digital companions.
-            </h2>
+            <p className="about-section__eyebrow">About EMO-WELL</p>
+            <h2>AI-powered mental wellness for everyone.</h2>
             <p>
-              Our clinicians, therapists, and digital care specialists
-              collaborate to close the gap between appointments. The Remedic
-              ecosystem keeps your wellbeing front of mind whether you reach out
-              in person or through the emotion assistant.
+              EMO-WELL is an AI-powered mental wellness platform designed to
+              help individuals understand and manage their emotions through
+              advanced multimodal emotion recognition. By analyzing text, audio,
+              and facial expressions, EMO-WELL provides accurate emotional
+              insights and delivers supportive, CBT-based guidance tailored to
+              each user's needs.
             </p>
-            <ul>
-              <li>
-                Integrated clinical, mental health, and wellness programmes
-              </li>
-              <li>
-                AI-assisted triage that respects privacy and data security
-              </li>
-              <li>24/7 access to guided exercises, insights, and community</li>
-            </ul>
+            <p>
+              Our goal is to make mental health support accessible,
+              confidential, and stigma-free. EMO-WELL offers a safe space where
+              users can express their feelings, receive instant emotional
+              feedback, and access personalized coping strategies anytime,
+              anywhere.
+            </p>
+            <p>
+              We aim to bridge the gap between individuals and emotional
+              well-being through intelligent, compassionate, and user-friendly
+              technology.
+            </p>
           </div>
           <div className="about-section__card">
             <h3>Care Snapshot</h3>
             <p>
-              120+ specialists deliver care across cardiology, paediatrics,
-              oncology, physiotherapy, and mental health, supported by a digital
-              experience designed for every mood and moment.
+              EMO-WELL is designed to understand your feelings the moment you
+              express them - whether through your voice, your face or your
+              words. It offers gentle, personalized guidance to promote
+              emotional balance anytime, anywhere.
             </p>
             <div className="about-stats">
-              <div>
-                <span className="about-stats__value">98%</span>
-                <span className="about-stats__label">Patient satisfaction</span>
+              <div className="about-stats__item">
+                <span className="about-stats__value">Multimodal AI</span>
+                <span className="about-stats__label">
+                  Text - Audio - Image emotion detection
+                </span>
               </div>
-              <div>
+              <div className="about-stats__item">
                 <span className="about-stats__value">24/7</span>
                 <span className="about-stats__label">Chatbot availability</span>
               </div>
-              <div>
-                <span className="about-stats__value">35k</span>
-                <span className="about-stats__label">Community members</span>
+              <div className="about-stats__item">
+                <span className="about-stats__value">2-3s</span>
+                <span className="about-stats__label">
+                  Average response for emotional insights
+                </span>
               </div>
             </div>
           </div>

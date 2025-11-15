@@ -64,7 +64,7 @@ const Header = ({ theme, toggleTheme }) => {
           <span className="brand__icon">
             <Icon type="scope" />
           </span>
-          <span className="brand__name">Remedic</span>
+          <span className="brand__name">EMOWELL</span>
         </Link>
         <nav className="site-nav" aria-label="Primary">
           <ul>

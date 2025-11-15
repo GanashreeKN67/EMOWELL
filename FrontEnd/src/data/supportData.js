@@ -178,7 +178,7 @@ export const resources = [
 ];
 
 export const infoLinks = [
-  { label: "About Remedic", to: "/#about" },
+  { label: "About EMOWELL", to: "/#about" },
   { label: "Support Options", to: "/#support" },
   { label: "Wellness Resources", to: "/#resources" },
   { label: "Emotion Assistant", to: "/text" },
@@ -194,10 +194,6 @@ export const footerLinks = [
 ];
 
 export const contactItems = [
-  {
-    label: "203 Fake St, Mountain View, San Francisco, California, USA",
-    icon: "location",
-  },
-  { label: "+2 392 3929 210", icon: "phone" },
-  { label: "info@yourdomain.com", icon: "mail" },
+  { label: "+91 8088529551", icon: "phone" },
+  { label: "ganashree99045@gmail.com", icon: "mail" },
 ];

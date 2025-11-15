@@ -14,7 +14,7 @@ const Footer = () => {
             <span className="brand__icon">
               <Icon type="scope" />
             </span>
-            <span className="brand__name">Remedic</span>
+            <span className="brand__name">EMOWELL</span>
           </div>
           <p>
             A trusted healthcare partner delivering evidence-based medicine,
@@ -76,7 +76,7 @@ const Footer = () => {
       </div>
       <div className="footer__bottom">
         <p>
-          © {new Date().getFullYear()} Remedic Medical Center. All rights
+          © {new Date().getFullYear()} EMOWELL Medical Center. All rights
           reserved.
         </p>
       </div>
