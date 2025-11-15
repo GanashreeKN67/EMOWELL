@@ -10,11 +10,17 @@
   --color-bg: #ffffff;
   --color-bg-soft: #f8f9fa;
   --color-border-soft: rgba(15, 23, 42, 0.08);
+  --color-surface-tooltip: #ffffff;
+  --color-chart-train: #0066cc;
+  --color-chart-validation: #f97316;
+  --color-chart-loss-train: #17c6d0;
+  --color-chart-loss-validation: #8b5cf6;
   --color-footer: #2e2e42;
   --color-footer-alt: #1f2937;
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-button: 0 4px 12px rgba(0, 102, 204, 0.3);
   --shadow-soft: 0 12px 24px rgba(15, 23, 42, 0.08);
+  --shadow-tooltip: 0 12px 30px rgba(15, 23, 42, 0.12);
   --radius-lg: 12px;
   --radius-md: 8px;
   --radius-xl: 24px;
@@ -41,11 +47,17 @@
   --color-bg: #0f172a;
   --color-bg-soft: #1e293b;
   --color-border-soft: rgba(255, 255, 255, 0.08);
+  --color-surface-tooltip: #0b1220;
+  --color-chart-train: #4da6ff;
+  --color-chart-validation: #fbbf24;
+  --color-chart-loss-train: #38e8f4;
+  --color-chart-loss-validation: #c084fc;
   --color-footer: #0a0f1f;
   --color-footer-alt: #060913;
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-button: 0 4px 12px rgba(77, 166, 255, 0.3);
   --shadow-soft: 0 12px 24px rgba(0, 0, 0, 0.35);
+  --shadow-tooltip: 0 16px 32px rgba(0, 0, 0, 0.6);
 }
 
 *,

@@ -50,9 +50,9 @@ def get_chatbot_response(user_message: str, conversation_history: list = None) -
     conversation_history = conversation_history or []
 
     system_prompt = (
-        "You are a compassionate mental health support assistant named CLARITY. "
-        "Your role is to listen empathetically, validate emotions, and provide supportive guidance. "
-        "Use CBT principles in your responses. Keep responses concise and supportive."
+        "You are EMOBOT, an emotional wellbeing assistant. "
+        "Your purpose is to listen attentively, validate what the user is feeling, and offer gentle, evidence-informed support. "
+        "Rely on CBT principles (thought reframing, grounding, small next steps) while keeping language warm, hopeful, and concise."
     )
 
     conversation_context = ""

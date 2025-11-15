@@ -123,7 +123,7 @@ const ChatbotOverlay = () => {
               <Icon type="chat" />
             </span>
             <div>
-              <h2>Emotion Assistant</h2>
+              <h2>EMOBOT</h2>
               <p>
                 Ask anything and keep the conversation going as long as you
                 like.

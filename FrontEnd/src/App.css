@@ -7,7 +7,7 @@ main {
 
 .app {
   background-color: var(--color-bg);
-  color: var(--color-text-dark);
+  color: inherit;
 }
 
 .icon {
@@ -1045,11 +1045,13 @@ main {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  color: var(--color-text-dark);
 }
 
 [data-theme="dark"] .chatbot-overlay__panel {
   background: var(--color-bg-soft);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  color: rgba(248, 250, 252, 0.92);
 }
 
 .chatbot-overlay__header {
@@ -1098,7 +1100,7 @@ main {
 
 [data-theme="dark"] .chatbot-overlay__close {
   background: rgba(255, 255, 255, 0.1);
-  color: var(--color-text-dark);
+  color: rgba(248, 250, 252, 0.9);
 }
 
 .chatbot-overlay__close:hover,
@@ -1120,6 +1122,11 @@ main {
   background: var(--color-bg-soft);
 }
 
+[data-theme="dark"] .chatbot-overlay__body {
+  background: rgba(15, 23, 42, 0.65);
+  color: rgba(248, 250, 252, 0.92);
+}
+
 .chatbot-overlay__messages {
   background: var(--color-bg);
   border-radius: var(--radius-lg);
@@ -1135,7 +1142,8 @@ main {
 }
 
 [data-theme="dark"] .chatbot-overlay__messages {
-  background: var(--color-bg);
+  background: #0f172a;
+  color: rgba(248, 250, 252, 0.92);
 }
 
 .chatbot-overlay__messages::-webkit-scrollbar {
@@ -1162,6 +1170,10 @@ main {
   color: var(--color-text-light);
 }
 
+[data-theme="dark"] .chatbot-overlay__placeholder {
+  color: rgba(226, 232, 240, 0.85);
+}
+
 .chatbot-overlay__placeholder h3 {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
@@ -1179,6 +1191,12 @@ main {
   align-self: flex-end;
   background: #dcf8c6;
   color: #1f2937;
+}
+
+[data-theme="dark"] .chatbot-overlay__message--user {
+  background: #c0f0a8;
+  color: #0f172a;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
 .chatbot-overlay__message--assistant {
@@ -1232,7 +1250,8 @@ main {
 
 [data-theme="dark"] .chatbot-overlay__form textarea {
   border-color: rgba(255, 255, 255, 0.2);
-  background: var(--color-bg);
+  background: #0f172a;
+  color: rgba(248, 250, 252, 0.92);
 }
 
 .chatbot-overlay__form textarea:focus {
@@ -1633,9 +1652,10 @@ main {
   max-width: 100%;
 }
 
+/* Default markdown styles */
 .markdown-content {
   line-height: 1.7;
-  color: var(--color-text-dark);
+  color: inherit;
 }
 
 .markdown-content h1,
@@ -1646,8 +1666,17 @@ main {
 .markdown-content h6 {
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
-  color: var(--color-text-dark);
+  color: inherit;
   font-weight: 700;
+}
+
+.markdown-content p,
+.markdown-content ul,
+.markdown-content ol,
+.markdown-content li,
+.markdown-content strong,
+.markdown-content em {
+  color: inherit;
 }
 
 .markdown-content h1 {
@@ -1660,22 +1689,6 @@ main {
 
 .markdown-content h3 {
   font-size: 1.25rem;
-}
-
-.markdown-content p {
-  margin-bottom: 1rem;
-  color: var(--color-text-dark);
-}
-
-.markdown-content ul,
-.markdown-content ol {
-  margin: 1rem 0;
-  padding-left: 1.5rem;
-  color: var(--color-text-dark);
-}
-
-.markdown-content li {
-  margin-bottom: 0.5rem;
 }
 
 .markdown-content code {
@@ -1703,13 +1716,14 @@ main {
   border-left: 4px solid var(--color-primary);
   padding-left: 1rem;
   margin: 1rem 0;
-  color: var(--color-text-light);
+  color: inherit;
+  opacity: 0.9;
   font-style: italic;
 }
 
 .markdown-content strong {
   font-weight: 700;
-  color: var(--color-text-dark);
+  color: inherit;
 }
 
 .markdown-content em {
@@ -1748,7 +1762,7 @@ main {
   border-radius: var(--radius-md);
   padding: 0.75rem;
   background: var(--color-bg);
-  color: var(--color-text-dark);
+  color: inherit;
   display: flex;
   flex-direction: column;
   align-items: center;

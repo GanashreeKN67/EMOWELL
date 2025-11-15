@@ -17,6 +17,8 @@ const TextSupportPanel = () => {
   const selectedMoodLabel =
     moodOptions.find((item) => item.id === selectedMood)?.label ?? "";
 
+  const visibleResult = isLoading ? null : result;
+
   const handleEvaluate = async (event) => {
     event.preventDefault();
 
@@ -32,6 +34,7 @@ const TextSupportPanel = () => {
     setIsLoading(true);
     setErrorMessage("");
     setSubmitted(false);
+    setResult(null);
 
     try {
       const payload = await detectTextEmotion({
@@ -75,6 +78,7 @@ const TextSupportPanel = () => {
 
     setIsLoading(true);
     setErrorMessage("");
+    setResult(null);
 
     try {
       const payload = await detectTextEmotion({
@@ -202,7 +206,7 @@ const TextSupportPanel = () => {
               {errorMessage}
             </div>
           ) : null}
-          <AnalysisResult result={result} />
+          <AnalysisResult result={visibleResult} />
         </div>
       ) : (
         <form className="evaluation" onSubmit={handleEvaluate}>
@@ -259,7 +263,7 @@ const TextSupportPanel = () => {
               Thank you for sharing. Review your emotion analysis below.
             </p>
           ) : null}
-          <AnalysisResult result={result} />
+          <AnalysisResult result={visibleResult} />
         </form>
       )}
     </div>

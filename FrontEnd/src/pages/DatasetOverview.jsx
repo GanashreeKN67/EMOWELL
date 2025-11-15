@@ -87,6 +87,13 @@ const AccuracyChart = ({ data }) => (
           <XAxis dataKey="epoch" tick={{ fontSize: 12 }} />
           <YAxis unit="%" domain={[0, 100]} tick={{ fontSize: 12 }} />
           <Tooltip
+            contentStyle={{
+              backgroundColor: "var(--color-surface-tooltip)",
+              borderRadius: 12,
+              border: "1px solid var(--color-border-soft)",
+              boxShadow: "var(--shadow-tooltip)",
+              color: "var(--color-text-dark)",
+            }}
             formatter={(value) => `${value}%`}
             labelFormatter={(label) => `Epoch ${label}`}
           />
@@ -94,7 +101,7 @@ const AccuracyChart = ({ data }) => (
           <Line
             type="monotone"
             dataKey="trainAccuracy"
-            stroke="var(--color-primary)"
+            stroke="var(--color-chart-train)"
             strokeWidth={2}
             dot={false}
             name="Train accuracy"
@@ -102,9 +109,10 @@ const AccuracyChart = ({ data }) => (
           <Line
             type="monotone"
             dataKey="valAccuracy"
-            stroke="var(--color-accent)"
+            stroke="var(--color-chart-validation)"
             strokeWidth={2}
             dot={false}
+            strokeDasharray="4 2"
             name="Validation accuracy"
           />
         </LineChart>
@@ -132,6 +140,13 @@ const LossChart = ({ data }) => (
           <XAxis dataKey="epoch" tick={{ fontSize: 12 }} />
           <YAxis tick={{ fontSize: 12 }} domain={["auto", "auto"]} />
           <Tooltip
+            contentStyle={{
+              backgroundColor: "var(--color-surface-tooltip)",
+              borderRadius: 12,
+              border: "1px solid var(--color-border-soft)",
+              boxShadow: "var(--shadow-tooltip)",
+              color: "var(--color-text-dark)",
+            }}
             labelFormatter={(label) => `Epoch ${label}`}
             formatter={(value) => Number(value).toFixed(3)}
           />
@@ -139,7 +154,7 @@ const LossChart = ({ data }) => (
           <Line
             type="monotone"
             dataKey="trainLoss"
-            stroke="var(--color-secondary)"
+            stroke="var(--color-chart-loss-train)"
             strokeWidth={2}
             dot={false}
             name="Train loss"
@@ -147,7 +162,7 @@ const LossChart = ({ data }) => (
           <Line
             type="monotone"
             dataKey="valLoss"
-            stroke="var(--color-text-light)"
+            stroke="var(--color-chart-loss-validation)"
             strokeWidth={2}
             dot={false}
             strokeDasharray="4 4"
@@ -178,6 +193,13 @@ const EvaluationChart = ({ data }) => (
           <XAxis dataKey="label" tick={{ fontSize: 11 }} />
           <YAxis unit="%" domain={[0, 110]} tick={{ fontSize: 12 }} />
           <Tooltip
+            contentStyle={{
+              backgroundColor: "var(--color-surface-tooltip)",
+              borderRadius: 12,
+              border: "1px solid var(--color-border-soft)",
+              boxShadow: "var(--shadow-tooltip)",
+              color: "var(--color-text-dark)",
+            }}
             formatter={(value) => `${value}%`}
             labelFormatter={(label) => label.toUpperCase()}
           />
