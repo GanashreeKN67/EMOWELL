@@ -5,6 +5,7 @@ from models.text_model import analyze_text_emotion
 from dependencies.auth import get_current_active_user
 from services.file_service import save_upload_file, cleanup_file
 from services.behavior_logger import log_behavior
+from services.suggestion_service import generate_personalized_suggestions
 from schemas.requests import TextAnalysisRequest
 from utils.validators import validate_image_file, validate_audio_file, validate_text_input
 from utils.response_formatter import format_emotion_response
@@ -36,11 +37,25 @@ async def analyze_image_emotion(
             metadata={"filename": file.filename, "source": "image_upload"},
         )
 
-        return format_emotion_response(
+        # Generate personalized suggestions
+        suggestions = await generate_personalized_suggestions(
+            current_emotion=result["emotion"],
+            confidence=result["confidence"],
+            modality="image",
+            user_id=str(current_user["_id"]),
+            all_predictions=result["all_predictions"]
+        )
+
+        response = format_emotion_response(
             emotion=result["emotion"],
             confidence=result["confidence"],
             all_predictions=result["all_predictions"],
         )
+        
+        # Add suggestions to response
+        response["suggestions"] = suggestions
+        
+        return response
 
     except HTTPException:
         raise
@@ -75,11 +90,25 @@ async def analyze_audio_emotion(
             metadata={"filename": file.filename, "source": "audio_upload"},
         )
 
-        return format_emotion_response(
+        # Generate personalized suggestions
+        suggestions = await generate_personalized_suggestions(
+            current_emotion=result["emotion"],
+            confidence=result["confidence"],
+            modality="audio",
+            user_id=str(current_user["_id"]),
+            all_predictions=result["all_predictions"]
+        )
+
+        response = format_emotion_response(
             emotion=result["emotion"],
             confidence=result["confidence"],
             all_predictions=result["all_predictions"],
         )
+        
+        # Add suggestions to response
+        response["suggestions"] = suggestions
+        
+        return response
 
     except HTTPException:
         raise

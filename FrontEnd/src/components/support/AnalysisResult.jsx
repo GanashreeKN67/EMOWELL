@@ -7,6 +7,7 @@ import {
   Tooltip,
 } from "recharts";
 import ReactMarkdown from "react-markdown";
+import SuggestionsPanel from "./SuggestionsPanel";
 
 const formatTimestamp = (timestamp) => {
   if (!timestamp) {
@@ -137,6 +138,16 @@ const AnalysisResult = ({ result }) => {
           </ul>
         </div>
       ) : null}
+      
+      {/* Add personalized suggestions panel */}
+      {result.suggestions && (
+        <SuggestionsPanel 
+          suggestions={result.suggestions}
+          emotion={rawEmotion}
+          confidence={result.confidence}
+          modality={modality}
+        />
+      )}
     </section>
   );
 };
