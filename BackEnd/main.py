@@ -13,7 +13,7 @@ from services.seed_service import seed_demo_data
 from services.user_service import ensure_user_indexes
 
 app = FastAPI(
-    title="CLARITY - Emotion Recognition & Mental Health Support",
+    title="EMOWELL - Emotion Recognition & Mental Health Support",
     description="Multi-modal emotion recognition with CBT-based mental health support",
     version="1.0.0",
 )
@@ -31,7 +31,7 @@ app.add_middleware(
 async def startup_event():
     """Load models on startup"""
     print("\n" + "=" * 80)
-    print("Starting CLARITY Backend...")
+    print("Starting EMOWELL Backend...")
     print("=" * 80)
 
     await connect_to_mongo()
@@ -74,7 +74,7 @@ app.include_router(health.router)
 async def root():
     """Root endpoint"""
     return {
-        "name": "CLARITY",
+        "name": "EMOWELL",
         "description": "Emotion Recognition & Mental Health Support System",
         "version": "1.0.0",
         "status": "online",
